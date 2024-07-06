@@ -8,8 +8,8 @@ create table word
 
 create table synonym
 (
-  word_1 integer not null,
-  word_2 integer not null,
+  word_1_id integer not null,
+  word_2_id integer not null,
   constraint synonyms_not_match_ck check (word_1 < word_2),
   constraint synonym_pk primary key (word_1, word_2),
   constraint synonym_w1_fk foreign key (word_1) references word (id),
