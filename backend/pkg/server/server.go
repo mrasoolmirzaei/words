@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -47,8 +46,7 @@ func NewServer(c *Config) (*Server, error) {
 func (s *Server) routes() {
 	s.router.HandleFunc("/word", s.addWord()).Methods("POST")
 	s.router.HandleFunc("/synonym/{word}", s.addSynonym()).Methods("POST")
-	s.router.HandleFunc("/synonyms/{word}", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "/synonyms/{word}") }).Methods("GET")
-	s.router.HandleFunc("/words/{synonym}", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "/words/{synonym}") }).Methods("GET")
+	s.router.HandleFunc("/synonyms/{word}", s.getSynonyms()).Methods("GET")
 }
 
 func (s *Server) Serve(listen string) error {

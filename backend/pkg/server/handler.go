@@ -11,6 +11,7 @@ import (
 
 const (
 	addSynonymPathParam = "word"
+	getSynonymsPathParam = "word"
 )
 
 func (s *Server) addWord() http.HandlerFunc {
@@ -66,5 +67,32 @@ func (s *Server) addSynonym() http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusCreated)
+	}
+}
+
+func (s *Server) getSynonyms() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		word, found := vars[getSynonymsPathParam]
+		if !found {
+			errMsg := fmt.Sprintf("missing %v in parameters", getSynonymsPathParam)
+			s.log.Errorf(errMsg)
+			http.Error(w, errMsg, http.StatusBadRequest)
+			return
+		}
+
+		req := api.GetSynonymsRequest{WordTitle: word}
+		resp, err := s.api.GetSynonyms(req)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		err = json.NewEncoder(w).Encode(resp)
+		if err != nil {
+			s.log.Errorf("failed to encode response: %v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 }

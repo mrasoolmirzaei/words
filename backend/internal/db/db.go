@@ -123,7 +123,7 @@ func (db *DB) GetSynonyms(id int) ([]*Word, error) {
 }
 
 func (db *DB) listWordsByID(id int, sqlQuery string) ([]*Word, error) {
-	childrenRows, err := db.conn.Query(getChildSynonymsSQL, id)
+	childrenRows, err := db.conn.Query(sqlQuery, id)
 	if err != nil {
 		return nil, err
 	}

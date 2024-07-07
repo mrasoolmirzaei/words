@@ -4,7 +4,7 @@ with recursive cte as (
   from
     synonym
   where
-    word_1_id = 1
+    word_1_id = ($1)
   union all
   select
     s.word_2_id as synonym_id
