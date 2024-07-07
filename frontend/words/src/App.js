@@ -1,17 +1,18 @@
-function App() {
+import ActionButtons from "./components/actionButtons/ActionButtons";
+import SearchBar from "./components/searchBar/SearchBar";
+import useSearchWord from "./services/hook/useSearchWord";
+
+const App = () => {
+
+  const { searchResults } = useSearchWord();
+
   return (
-    <div class="position-absolute top-50 start-50 translate-middle">
-          <div class="input-group mb-3">
-            <input type="search" 
-            class="form-control" 
-            placeholder="Search for a word" 
-            aria-label="Search" 
-            described="search"></input>
-            <span class="input-group-text" id="search">Search</span>
-      </div>
+    <div className="position-absolute top-50 start-50 translate-middle">
+      <SearchBar />
+      <ActionButtons />
+      {searchResults && <div>Search Results: {JSON.stringify(searchResults)}</div>}
     </div>
-    
   );
-}
+};
 
 export default App;
