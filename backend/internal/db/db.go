@@ -5,7 +5,26 @@ import (
 	"log"
 
 	_ "github.com/lib/pq"
+	_ "embed"
 )
+
+//go:embed sqls/addWord.sql
+var addWordSQL string
+
+//go:embed sqls/addSynonym.sql
+var addSynonymSQL string
+
+//go:embed sqls/getWord.sql
+var getWordSQL string
+
+//go:embed sqls/searchWord.sql
+var searchWordSQL string
+
+//go:embed sqls/getParentSynonyms.sql
+var getParentSynonymsSQL string
+
+//go:embed sqls/getChildSynonyms.sql
+var getChildSynonymsSQL string
 
 type Storer interface {
 	Close() error
@@ -13,7 +32,7 @@ type Storer interface {
 	// GetWord returns a word by its ID.
 	GetWord(id string) (*Word, error)
 	// GetDirectSynonyms returns a list of direct synonyms for a word.
-	GetDirectSynonyms(id string) ([]*Word, error)
+	GetSynonyms(id int) ([]*Word, error)
 
 	// AddWord adds a new word to the database.
 	AddWord(title string) (*Word, error)
@@ -43,7 +62,6 @@ func (db *DB) Close() error {
 }
 
 func (db *DB) GetWord(id string) (*Word, error) {
-	getWordSQL := `SELECT id, title FROM word WHERE id = $1`
 	row := db.conn.QueryRow(getWordSQL, id)
 
 	var w Word
@@ -56,7 +74,6 @@ func (db *DB) GetWord(id string) (*Word, error) {
 }
 
 func (db *DB) AddWord(title string) (*Word, error) {
-	addWordSQL := `INSERT INTO word (title) VALUES ($1) RETURNING id, title`
 	row := db.conn.QueryRow(addWordSQL, title)
 
 	word := &Word{}
@@ -69,7 +86,6 @@ func (db *DB) AddWord(title string) (*Word, error) {
 }
 
 func (db *DB) AddSynonym(word_id_1, word_id_2 int) error {
-	addSynonymSQL := `INSERT INTO synonym (word_1_id, word_2_id) VALUES ($1, $2)`
 	_, err := db.conn.Exec(addSynonymSQL, word_id_1, word_id_2)
 	if err != nil {
 		return err
@@ -79,7 +95,6 @@ func (db *DB) AddSynonym(word_id_1, word_id_2 int) error {
 }
 
 func (db *DB) SearchWord(title string) (*Word, error) {
-	searchWordSQL := `SELECT id, title FROM word WHERE title = $1`
 	row := db.conn.QueryRow(searchWordSQL, title)
 
 	var w Word
@@ -91,22 +106,40 @@ func (db *DB) SearchWord(title string) (*Word, error) {
 	return &w, nil
 }
 
-func (db *DB) GetDirectSynonyms(id string) ([]*Word, error) {
-	searchSynonymsSQL := `SELECT id, title FROM word WHERE id IN (SELECT word_2_id FROM synonym WHERE word_1_id = $1)`
-	rows, err := db.conn.Query(searchSynonymsSQL, id)
+func (db *DB) GetSynonyms(id int) ([]*Word, error) {
+	parentWords, err := db.listWordsByID(id, getParentSynonymsSQL)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+
+	childWords, err := db.listWordsByID(id, getChildSynonymsSQL)
+	if err != nil {
+		return nil, err
+	}
+
+	words := append(parentWords, childWords...)
+
+	return words, nil
+}
+
+func (db *DB) listWordsByID(id int, sqlQuery string) ([]*Word, error) {
+	childrenRows, err := db.conn.Query(getChildSynonymsSQL, id)
+	if err != nil {
+		return nil, err
+	}
+	defer childrenRows.Close()
 
 	var words []*Word
-	for rows.Next() {
+	for childrenRows.Next() {
 		var w Word
-		err := rows.Scan(&w.ID, &w.Title)
+		err := childrenRows.Scan(&w.ID, &w.Title)
 		if err != nil {
 			return nil, err
 		}
 
+		if w.ID == id {
+			continue
+		}
 		words = append(words, &w)
 	}
 

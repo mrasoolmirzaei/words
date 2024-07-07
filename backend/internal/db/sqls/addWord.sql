@@ -1,0 +1,1 @@
+INSERT INTO word (title) VALUES ($1) RETURNING id, title

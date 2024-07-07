@@ -1,0 +1,1 @@
+INSERT INTO synonym (word_1_id, word_2_id) VALUES ($1, $2)

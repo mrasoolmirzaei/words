@@ -1,0 +1,1 @@
+SELECT id, title FROM word WHERE id = $1

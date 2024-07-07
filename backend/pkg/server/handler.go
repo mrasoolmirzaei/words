@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 
-	m "github.com/mrasoolmirzaei/words/backend/pkg/api"
+	"github.com/mrasoolmirzaei/words/backend/pkg/api"
 )
 
 const (
@@ -15,7 +15,7 @@ const (
 
 func (s *Server) addWord() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		req := m.AddWordRequest{}
+		req := api.AddWordRequest{}
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			s.log.Errorf("invalid request format: %v", err)
@@ -41,7 +41,7 @@ func (s *Server) addWord() http.HandlerFunc {
 
 func (s *Server) addSynonym() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		req := m.AddSynonymRequest{}
+		req := api.AddSynonymRequest{}
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			s.log.Errorf("invalid request format: %v", err)
