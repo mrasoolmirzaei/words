@@ -1,4 +1,4 @@
-package api_models
+package api
 
 type AddWordRequest struct {
 	Title string `json:"title"`
@@ -6,4 +6,9 @@ type AddWordRequest struct {
 
 type AddWordResponse struct {
 	Title string `json:"title"`
+}
+
+type AddSynonymRequest struct {
+	WordTitle  string
+	SynonymTitle string `json:"synonym"`
 }

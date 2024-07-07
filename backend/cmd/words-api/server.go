@@ -11,6 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/mrasoolmirzaei/words/backend/pkg/api"
 	"github.com/mrasoolmirzaei/words/backend/pkg/server"
 )
 
@@ -21,8 +22,11 @@ func serverAction(log *logrus.Logger) cli.ActionFunc {
 			return err
 		}
 		serverLogger := log.WithField("context", "server")
+
+		api := api.NewAPI(db, serverLogger)
+
 		config := &server.Config{
-			DB:         db,
+			Api:        api,
 			Logger:     serverLogger,
 			CliContext: cc,
 		}

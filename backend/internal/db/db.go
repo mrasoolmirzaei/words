@@ -18,7 +18,7 @@ type Storer interface {
 	// AddWord adds a new word to the database.
 	AddWord(title string) (*Word, error)
 	// AddSynonym adds a new synonym relationship to the database.
-	AddSynonym(word_id_1, word_id_2 string) error
+	AddSynonym(word_1_id, word_2_id int) error
 
 	// SearchWord searches for a word by its title.
 	SearchWord(title string) (*Word, error)
@@ -68,8 +68,8 @@ func (db *DB) AddWord(title string) (*Word, error) {
 	return word, nil
 }
 
-func (db *DB) AddSynonym(word_id_1, word_id_2 string) error {
-	addSynonymSQL := `INSERT INTO synonym (word_id_1, word_id_2) VALUES ($1, $2)`
+func (db *DB) AddSynonym(word_id_1, word_id_2 int) error {
+	addSynonymSQL := `INSERT INTO synonym (word_1_id, word_2_id) VALUES ($1, $2)`
 	_, err := db.conn.Exec(addSynonymSQL, word_id_1, word_id_2)
 	if err != nil {
 		return err
@@ -92,7 +92,7 @@ func (db *DB) SearchWord(title string) (*Word, error) {
 }
 
 func (db *DB) GetDirectSynonyms(id string) ([]*Word, error) {
-	searchSynonymsSQL := `SELECT id, title FROM word WHERE id IN (SELECT word_id_2 FROM synonym WHERE word_id_1 = $1)`
+	searchSynonymsSQL := `SELECT id, title FROM word WHERE id IN (SELECT word_2_id FROM synonym WHERE word_1_id = $1)`
 	rows, err := db.conn.Query(searchSynonymsSQL, id)
 	if err != nil {
 		return nil, err
