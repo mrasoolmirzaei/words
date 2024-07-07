@@ -12,6 +12,8 @@ type Storer interface {
 
 	// GetWord returns a word by its ID.
 	GetWord(id string) (*Word, error)
+	// GetDirectSynonyms returns a list of direct synonyms for a word.
+	GetDirectSynonyms(id string) ([]*Word, error)
 
 	// AddWord adds a new word to the database.
 	AddWord(title string) (*Word, error)
@@ -20,8 +22,6 @@ type Storer interface {
 
 	// SearchWord searches for a word by its title.
 	SearchWord(title string) (*Word, error)
-	// SearchSynonyms searches for synonyms of a word by its ID.
-	SearchSynonyms(id string) ([]*Word, error)
 }
 
 type DB struct {
@@ -43,7 +43,7 @@ func (db *DB) Close() error {
 }
 
 func (db *DB) GetWord(id string) (*Word, error) {
-	getWordSQL := `SELECT id, title FROM words WHERE id = $1`
+	getWordSQL := `SELECT id, title FROM word WHERE id = $1`
 	row := db.conn.QueryRow(getWordSQL, id)
 
 	var w Word
@@ -56,11 +56,11 @@ func (db *DB) GetWord(id string) (*Word, error) {
 }
 
 func (db *DB) AddWord(title string) (*Word, error) {
-	addWordSQL := `INSERT INTO words (title) VALUES ($1) RETURNING id, title`
+	addWordSQL := `INSERT INTO word (title) VALUES ($1) RETURNING id, title`
 	row := db.conn.QueryRow(addWordSQL, title)
 
 	word := &Word{}
-	err := row.Scan(word.ID, word.Title)
+	err := row.Scan(&word.ID, &word.Title)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (db *DB) AddWord(title string) (*Word, error) {
 }
 
 func (db *DB) AddSynonym(word_id_1, word_id_2 string) error {
-	addSynonymSQL := `INSERT INTO synonyms (word_id_1, word_id_2) VALUES ($1, $2)`
+	addSynonymSQL := `INSERT INTO synonym (word_id_1, word_id_2) VALUES ($1, $2)`
 	_, err := db.conn.Exec(addSynonymSQL, word_id_1, word_id_2)
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func (db *DB) AddSynonym(word_id_1, word_id_2 string) error {
 }
 
 func (db *DB) SearchWord(title string) (*Word, error) {
-	searchWordSQL := `SELECT id, title FROM words WHERE title = $1`
+	searchWordSQL := `SELECT id, title FROM word WHERE title = $1`
 	row := db.conn.QueryRow(searchWordSQL, title)
 
 	var w Word
@@ -91,8 +91,8 @@ func (db *DB) SearchWord(title string) (*Word, error) {
 	return &w, nil
 }
 
-func (db *DB) SearchSynonyms(id string) ([]*Word, error) {
-	searchSynonymsSQL := `SELECT id, title FROM words WHERE id IN (SELECT word_id_2 FROM synonyms WHERE word_id_1 = $1)`
+func (db *DB) GetDirectSynonyms(id string) ([]*Word, error) {
+	searchSynonymsSQL := `SELECT id, title FROM word WHERE id IN (SELECT word_id_2 FROM synonym WHERE word_id_1 = $1)`
 	rows, err := db.conn.Query(searchSynonymsSQL, id)
 	if err != nil {
 		return nil, err
@@ -112,4 +112,3 @@ func (db *DB) SearchSynonyms(id string) ([]*Word, error) {
 
 	return words, nil
 }
-

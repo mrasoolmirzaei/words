@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -13,6 +14,11 @@ func main() {
 
 	log := logrus.New()
 	log.Out = os.Stdout
+
+	err := godotenv.Load("../../.env")
+	if err != nil {
+		log.Fatal("No .env file found")
+	}
 
 	log.Info("Starting words-backend service...")
 
@@ -39,6 +45,11 @@ func getServerFlags() []cli.Flag {
 			Usage:   "listen HTTP `IP:PORT`",
 			EnvVars: []string{"LISTEN_HTTP"},
 			Value:   ":8080",
+		},
+		&cli.StringFlag{
+			Name:    "pq-conn",
+			Usage:   "Postgres connection string",
+			EnvVars: []string{"PQ_CONN"},
 		},
 	}
 	return flags

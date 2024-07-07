@@ -8,12 +8,14 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/mrasoolmirzaei/words/backend/internal/db"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
 // Server implements the main server over http.
 type Server struct {
+	db       db.Storer
 	log      logrus.FieldLogger
 	router   *mux.Router
 	stopChan chan struct{}
@@ -21,6 +23,7 @@ type Server struct {
 
 // Config is used to initialize a new server.
 type Config struct {
+	DB         db.Storer
 	CliContext *cli.Context
 	Logger     logrus.FieldLogger
 }
@@ -31,6 +34,7 @@ func NewServer(c *Config) (*Server, error) {
 	}
 
 	s := &Server{
+		db:       c.DB,
 		router:   mux.NewRouter(),
 		log:      c.Logger,
 		stopChan: make(chan struct{}),
@@ -41,7 +45,7 @@ func NewServer(c *Config) (*Server, error) {
 }
 
 func (s *Server) routes() {
-	s.router.HandleFunc("/word", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "/word") }).Methods("POST")
+	s.router.HandleFunc("/word", s.addWord()).Methods("POST")
 	s.router.HandleFunc("/synonym/{word}", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "/synonym/{word}") }).Methods("POST")
 	s.router.HandleFunc("/synonyms/{word}", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "/synonyms/{word}") }).Methods("GET")
 	s.router.HandleFunc("/words/{synonym}", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "/words/{synonym}") }).Methods("GET")

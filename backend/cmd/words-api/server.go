@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/mrasoolmirzaei/words/backend/internal/db"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/sync/errgroup"
@@ -15,9 +16,13 @@ import (
 
 func serverAction(log *logrus.Logger) cli.ActionFunc {
 	return func(cc *cli.Context) error {
-
+		db, err := db.NewDB(cc.String("pq-conn"))
+		if err != nil {
+			return err
+		}
 		serverLogger := log.WithField("context", "server")
 		config := &server.Config{
+			DB:         db,
 			Logger:     serverLogger,
 			CliContext: cc,
 		}
