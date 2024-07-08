@@ -5,8 +5,16 @@ const useAddSynonym = () => {
   const [synonym, setSynonym] = useState('');
 
   const addSynonymHandler = async (word, synonym) => {
-    const result = await addSynonym(word, synonym);
-    setSynonym(result);
+    try {
+      const result = await addSynonym(word, synonym);
+      if (result.success) {
+        setSynonym(result.data);
+      } else {
+        console.error({ error: result.error });
+      }
+    } catch (error) {
+      console.error(`addSynonymHandler failed: ${error.message}`);
+    }
   };
 
   return { synonym, addSynonym: addSynonymHandler };
