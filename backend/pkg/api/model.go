@@ -9,7 +9,7 @@ type AddWordResponse struct {
 }
 
 type AddSynonymRequest struct {
-	WordTitle  string
+	WordTitle    string
 	SynonymTitle string `json:"synonym"`
 }
 
@@ -22,6 +22,12 @@ type GetSynonymsResponse struct {
 }
 
 type Word struct {
-	ID    int	`json:"id"`
+	ID    int    `json:"id"`
 	Title string `json:"title"`
+}
+
+type Error struct {
+	Message     string
+	HttpCode    int
+	DBErrorCode string
 }

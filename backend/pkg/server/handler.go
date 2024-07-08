@@ -24,9 +24,9 @@ func (s *Server) addWord() http.HandlerFunc {
 			return
 		}
 
-		resp, err := s.api.AddWord(req)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		resp, cErr := s.api.AddWord(req)
+		if cErr != nil {
+			http.Error(w, cErr.Message, cErr.HttpCode)
 			return
 		}
 
@@ -60,9 +60,9 @@ func (s *Server) addSynonym() http.HandlerFunc {
 		}
 		req.WordTitle = word
 
-		err = s.api.AddSynonym(req)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		cErr := s.api.AddSynonym(req)
+		if cErr != nil {
+			http.Error(w, cErr.Message, cErr.HttpCode)
 			return
 		}
 
@@ -82,13 +82,13 @@ func (s *Server) getSynonyms() http.HandlerFunc {
 		}
 
 		req := api.GetSynonymsRequest{WordTitle: word}
-		resp, err := s.api.GetSynonyms(req)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		resp, cErr := s.api.GetSynonyms(req)
+		if cErr != nil {
+			http.Error(w, cErr.Message, cErr.HttpCode)
 			return
 		}
 
-		err = json.NewEncoder(w).Encode(resp)
+		err := json.NewEncoder(w).Encode(resp)
 		if err != nil {
 			s.log.Errorf("failed to encode response: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)

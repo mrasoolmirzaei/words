@@ -12,5 +12,6 @@ with recursive cte as (
     cte
     join synonym s on cte.synonym_id = s.word_2_id
 )
-select id, title from cte
-join word on cte.synonym_id = word.id;
+select distinct id, title from cte
+join word on cte.synonym_id = word.id
+where word.id != ($1);
