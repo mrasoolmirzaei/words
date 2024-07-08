@@ -1,14 +1,14 @@
 import { useState } from "react";
-import useSearchWord from "../../services/hook/useSearchWord";
 
-const SearchBar = () => {
+const SearchBar = ({onSearch}) => {
+
   const [searchQuery, setSearchQuery] = useState("");
-  const { handleSearch } = useSearchWord();
+
   const handleSearchBar = (e) => {
     setSearchQuery(e.target.value);
   };
   const submitSearch = () => {
-    handleSearch(searchQuery)
+    onSearch(searchQuery)
   }
   return (
     <div className="input-group mb-3">
@@ -21,7 +21,7 @@ const SearchBar = () => {
         value={searchQuery}
         onChange={handleSearchBar}
       />
-      <button className="input-group-text" id="search" onClick={submitSearch}>
+      <button className="input-group-text" onClick={submitSearch}>
         Search
       </button>
     </div>

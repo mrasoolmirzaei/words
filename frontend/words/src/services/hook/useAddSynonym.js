@@ -4,9 +4,9 @@ import { addSynonym } from '../api/synonym';
 const useAddSynonym = () => {
   const [synonym, setSynonym] = useState('');
 
-  const addSynonymHandler = async (word, synonym) => {
+  const addSynonymHandler = async ({word, synonym:wordSynonym}) => {
     try {
-      const result = await addSynonym(word, synonym);
+      const result = await addSynonym(word, wordSynonym);
       if (result.success) {
         setSynonym(result.data);
       } else {
