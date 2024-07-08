@@ -135,10 +135,6 @@ func (db *DB) listWordsByID(id int, sqlQuery string) ([]*Word, error) {
 		if err != nil {
 			return nil, err
 		}
-
-		if w.ID == id {
-			continue
-		}
 		words = append(words, &w)
 	}
 

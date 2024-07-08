@@ -31,3 +31,5 @@ type Error struct {
 	HttpCode    int
 	DBErrorCode string
 }
+
+type InputWord string
