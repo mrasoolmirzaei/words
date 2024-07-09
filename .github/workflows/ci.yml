@@ -33,6 +33,7 @@ jobs:
 
     - name: Verify the dependencies
       run: go mod verify
+      working-directory: ./backend
 
     - name: Run tests
       run: go test ./...
