@@ -22,9 +22,11 @@ jobs:
       with:
         go-version-file: 'go.mod'
         check-latest: true
+        working-directory: ./backend
 
     - name: Go tidy to ensure no untidy changes have been committed
       run: go mod tidy && git diff --exit-code
+      working-directory: ./backend
   
     - name: Install dependencies
       run: go mod download
