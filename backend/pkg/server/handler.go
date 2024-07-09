@@ -2,15 +2,16 @@ package server
 
 import (
 	"encoding/json"
-	"net/http"
 	"fmt"
+	"net/http"
+
 	"github.com/gorilla/mux"
 
 	"github.com/mrasoolmirzaei/words/backend/pkg/api"
 )
 
 const (
-	addSynonymPathParam = "word"
+	addSynonymPathParam  = "word"
 	getSynonymsPathParam = "word"
 )
 
@@ -84,7 +85,6 @@ func (s *Server) getSynonyms() http.HandlerFunc {
 		req := api.GetSynonymsRequest{WordTitle: api.InputWord(word)}
 		resp, cErr := s.api.GetSynonyms(req)
 		if cErr != nil {
-			s.log.Info(cErr.DBErrorCode)
 			http.Error(w, cErr.Message, cErr.HttpCode)
 			return
 		}

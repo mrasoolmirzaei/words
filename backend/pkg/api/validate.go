@@ -41,6 +41,15 @@ func (r AddSynonymRequest) Validate() (string, bool) {
 	}
 
 	errorMsg, isInvalid = r.SynonymTitle.Validate()
+	if isInvalid {
+		return errorMsg, isInvalid
+	}
+
+	if r.WordTitle == r.SynonymTitle {
+		errorMsg = "input word and synonym are the same"
+		isInvalid = true
+		return errorMsg, isInvalid
+	}
 
 	return errorMsg, isInvalid
 }
