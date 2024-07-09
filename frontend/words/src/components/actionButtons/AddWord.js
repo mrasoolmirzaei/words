@@ -14,11 +14,9 @@ const AddWord = () => {
     <div className="form-group">
       <label htmlFor="wordInput">Add Word</label>
       <div className="input-group">
-        <div className="input-group-prepend">
-          <button className="input-group-text" onClick={handleAddWord}>
+        <button className="input-group-text" onClick={handleAddWord}>
             +
-          </button>
-        </div>
+        </button>
         <input
           type="text"
           className="form-control"

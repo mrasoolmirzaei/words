@@ -18,8 +18,8 @@ const App = () => {
         </div>
         <SearchBar onSearch={handleSearch} />
         <SearchResults results={searchResults} />
-        {loading && <Loading />}
       </div>
+        {loading && <Loading />}
       <ToastContainer position="bottom-left" />
     </>
   );

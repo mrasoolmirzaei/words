@@ -22,11 +22,9 @@ const AddSynonym = () => {
     <div className="form-group">
       <label htmlFor="wordInput">Add Synonym</label>
       <div className="input-group">
-        <div className="input-group-prepend">
-          <button className="input-group-text" onClick={handleAddSynonym}>
+        <button className="input-group-text" onClick={handleAddSynonym}>
             +
-          </button>
-        </div>
+        </button>
         <input
           type="text"
           className="form-control"
