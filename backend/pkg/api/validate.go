@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -77,13 +78,13 @@ func (w InputWord) Validate() (string, bool) {
 
 	// Longest word in English dictionary is 45 characters
 	if len(w) > 45 || len(w) < 2  {
-		errorMsg = "input word is too long or too short, maximum 45 and minimum 2 characters"
+		errorMsg = fmt.Sprintf("input word is too long or too short, maximum 45 and minimum 2 characters. current length: %v", len(w))
 		isInvalid = true
 	}
 	// Check if all characters are alphabets
 	for _, c := range w {
 		if c < 'a' || c > 'z' {
-			errorMsg = "input word should contain only alphabets"
+			errorMsg = fmt.Sprintf("input word should contain only alphabets. invalid character: %v", c)
 			isInvalid = true
 			break
 		}
