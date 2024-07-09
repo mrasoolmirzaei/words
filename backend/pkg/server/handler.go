@@ -58,7 +58,7 @@ func (s *Server) addSynonym() http.HandlerFunc {
 			http.Error(w, errMsg, http.StatusBadRequest)
 			return
 		}
-		req.WordTitle = word
+		req.WordTitle = api.InputWord(word)
 
 		cErr := s.api.AddSynonym(req)
 		if cErr != nil {
@@ -81,9 +81,10 @@ func (s *Server) getSynonyms() http.HandlerFunc {
 			return
 		}
 
-		req := api.GetSynonymsRequest{WordTitle: word}
+		req := api.GetSynonymsRequest{WordTitle: api.InputWord(word)}
 		resp, cErr := s.api.GetSynonyms(req)
 		if cErr != nil {
+			s.log.Info(cErr.DBErrorCode)
 			http.Error(w, cErr.Message, cErr.HttpCode)
 			return
 		}

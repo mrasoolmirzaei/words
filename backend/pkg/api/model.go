@@ -1,7 +1,7 @@
 package api
 
 type AddWordRequest struct {
-	Title string `json:"title"`
+	Title InputWord `json:"title"`
 }
 
 type AddWordResponse struct {
@@ -9,12 +9,12 @@ type AddWordResponse struct {
 }
 
 type AddSynonymRequest struct {
-	WordTitle    string
-	SynonymTitle string `json:"synonym"`
+	WordTitle    InputWord
+	SynonymTitle InputWord `json:"synonym"`
 }
 
 type GetSynonymsRequest struct {
-	WordTitle string `json:"word"`
+	WordTitle InputWord `json:"word"`
 }
 
 type GetSynonymsResponse struct {

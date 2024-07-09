@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/lib/pq"
@@ -27,7 +28,15 @@ func NewAPI(db db.Storer, log logrus.FieldLogger) *API {
 }
 
 func (a *API) AddWord(req AddWordRequest) (*AddWordResponse, *Error) {
-	word, err := a.db.AddWord(req.Title)
+	errMsg, isInvalid := req.Validate()
+	if isInvalid {
+		return nil, &Error{
+			Message:  errMsg,
+			HttpCode: http.StatusBadRequest,
+		}
+	}
+
+	dbWord, err := a.db.AddWord(req.Title.String())
 	if err != nil {
 		a.log.Errorf("failed to add word: %v", err)
 		return nil, customizeError(err)
@@ -35,19 +44,26 @@ func (a *API) AddWord(req AddWordRequest) (*AddWordResponse, *Error) {
 
 	return &AddWordResponse{
 		Word: &Word{
-			ID:    word.ID,
-			Title: word.Title,
+			ID:    dbWord.ID,
+			Title: dbWord.Title,
 		}}, nil
 }
 
 func (a *API) AddSynonym(req AddSynonymRequest) *Error {
-	word, err := a.db.SearchWord(req.WordTitle)
+	errMsg, isInvalid := req.Validate()
+	if isInvalid {
+		return &Error{
+			Message:  errMsg,
+			HttpCode: http.StatusBadRequest,
+		}
+	}
+	word, err := a.db.SearchWord(req.WordTitle.String())
 	if err != nil {
 		a.log.Errorf("failed to find first word %v: %v", req.WordTitle, err)
 		return customizeError(err)
 	}
 
-	synonym, err := a.db.SearchWord(req.SynonymTitle)
+	synonym, err := a.db.SearchWord(req.SynonymTitle.String())
 	if err != nil {
 		a.log.Errorf("failed to find second word: %v", err)
 		return customizeError(err)
@@ -77,7 +93,15 @@ func (a *API) AddSynonym(req AddSynonymRequest) *Error {
 }
 
 func (a *API) GetSynonyms(req GetSynonymsRequest) (*GetSynonymsResponse, *Error) {
-	word, err := a.db.SearchWord(req.WordTitle)
+	errMsg, isInvalid := req.Validate()
+	if isInvalid {
+		return nil, &Error{
+			Message:  errMsg,
+			HttpCode: http.StatusBadRequest,
+		}
+	}
+	
+	word, err := a.db.SearchWord(req.WordTitle.String())
 	if err != nil {
 		a.log.Errorf("failed to find word: %v", err)
 		return nil, customizeError(err)
@@ -105,6 +129,12 @@ func customizeError(err error) *Error {
 	customizedError := &Error{
 		Message:  "internal server error",
 		HttpCode: 500,
+	}
+
+	if err == sql.ErrNoRows {
+		customizedError.Message = "word not found"
+		customizedError.HttpCode = http.StatusNotFound
+		return customizedError
 	}
 
 	pgErr, ok := err.(*pq.Error)
