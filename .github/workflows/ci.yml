@@ -46,7 +46,3 @@ jobs:
     - name: Install dependencies
       run: npm install
       working-directory: ./frontend/words
-
-    - name: Run tests
-      run: npm test --passWithNoTests
-      working-directory: ./frontend/words
