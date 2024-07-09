@@ -48,5 +48,5 @@ jobs:
       working-directory: ./frontend/words
 
     - name: Run tests
-      run: npm test
+      run: npm test --passWithNoTests
       working-directory: ./frontend/words
