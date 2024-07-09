@@ -9,6 +9,7 @@ const SearchBar = ({ onSearch }) => {
     if (!value) onSearch("");
   };
   const submitSearch = () => {
+    onSearch("");
     onSearch(searchQuery);
   };
   return (
@@ -18,7 +19,6 @@ const SearchBar = ({ onSearch }) => {
         className="form-control"
         placeholder="Search for a word"
         aria-label="Search"
-        described="search"
         value={searchQuery}
         onChange={handleSearchBar}
       />

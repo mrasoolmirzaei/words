@@ -13,11 +13,14 @@ const request = async (url, method, body = null) => {
   }
 
   try {
-    const response = await fetch(`${url}`, options);
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      toast.error(errorMessage);
+    }
     return response;
   } catch (error) {
     toast.error(`Request failed: ${error.message}`);
-    throw error;
   }
 };
 

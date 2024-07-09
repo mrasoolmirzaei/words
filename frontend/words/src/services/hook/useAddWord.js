@@ -10,8 +10,6 @@ const useAddWord = () => {
     const result = await addWord(word);
     if (result.ok) {
       toast.success("Word added successfully!");
-    } else {
-      toast.error(result.statusText);
     }
     setLoading(false);
   };

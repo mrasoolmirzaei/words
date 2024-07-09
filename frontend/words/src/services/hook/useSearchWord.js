@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { searchSynonym } from "../api/synonym";
-import { toast } from "react-toastify";
 
 const useSearchWord = () => {
   const [searchResults, setSearchResults] = useState(null);
@@ -12,17 +11,12 @@ const useSearchWord = () => {
       return;
     }
     setLoading(true);
-    try {
-      const result = await searchSynonym(query);
-      if (result.ok) {
-        const data = await result.json();
-        setSearchResults(data);
-      }else {
-        toast.error(result.statusText);
-      }
-    } finally {
-      setLoading(false);
+    const result = await searchSynonym(query);
+    if (result.ok) {
+      const data = await result.json();
+      setSearchResults(data);
     }
+    setLoading(false);
   };
 
   return { searchResults, loading, handleSearch: searchWordHandler };
