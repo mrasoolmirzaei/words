@@ -19,26 +19,29 @@ const AddSynonym = () => {
   };
 
   return (
-    <div className="input-group">
-      <div className="input-group-prepend">
-        <button className="input-group-text" onClick={handleAddSynonym}>
-          +
-        </button>
+    <div className="form-group">
+      <label htmlFor="wordInput">Add Synonym</label>
+      <div className="input-group">
+        <div className="input-group-prepend">
+          <button className="input-group-text" onClick={handleAddSynonym}>
+            +
+          </button>
+        </div>
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Word"
+          value={word}
+          onChange={handleWord}
+        />
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Synonym"
+          value={synonym}
+          onChange={handleSynonym}
+        />
       </div>
-      <input
-        type="text"
-        className="form-control"
-        placeholder="Word"
-        value={word}
-        onChange={handleWord}
-      />
-      <input
-        type="text"
-        className="form-control"
-        placeholder="Synonym"
-        value={synonym}
-        onChange={handleSynonym}
-      />
     </div>
   );
 };

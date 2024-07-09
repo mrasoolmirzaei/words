@@ -1,23 +1,31 @@
-import { useState } from 'react';
-import { searchSynonym } from '../api/synonym';
+import { useState } from "react";
+import { searchSynonym } from "../api/synonym";
+import { toast } from "react-toastify";
 
 const useSearchWord = () => {
   const [searchResults, setSearchResults] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const searchWordHandler = async (query) => {
+    if (!query) {
+      setSearchResults(null);
+      return;
+    }
+    setLoading(true);
     try {
       const result = await searchSynonym(query);
-      if (result.success) {
-        setSearchResults(result.data);
-      } else {
-        console.error({ error: result.error });
+      if (result.ok) {
+        const data = await result.json();
+        setSearchResults(data);
+      }else {
+        toast.error(result.statusText);
       }
-    } catch (error) {
-      console.error(`searchWordHandler failed: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
-  return { searchResults, handleSearch: searchWordHandler };
+  return { searchResults, loading, handleSearch: searchWordHandler };
 };
 
 export default useSearchWord;

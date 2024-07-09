@@ -1,15 +1,16 @@
 import { useState } from "react";
 
-const SearchBar = ({onSearch}) => {
-
+const SearchBar = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearchBar = (e) => {
-    setSearchQuery(e.target.value);
+    const { value } = e.target;
+    setSearchQuery(value);
+    if (!value) onSearch("");
   };
   const submitSearch = () => {
-    onSearch(searchQuery)
-  }
+    onSearch(searchQuery);
+  };
   return (
     <div className="input-group mb-3">
       <input

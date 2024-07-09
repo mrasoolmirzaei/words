@@ -1,23 +1,22 @@
-import { useState } from 'react';
-import { addWord } from '../api/word';
+import { useState } from "react";
+import { addWord } from "../api/word";
+import { toast } from "react-toastify";
 
 const useAddWord = () => {
-  const [word, setWord] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const addWordHandler = async (word) => {
-    try {
-      const result = await addWord(word);
-      if (result.success) {
-        setWord(result.data);
-      } else {
-        console.error({ error: result.error });
-      }
-    } catch (error) {
-      console.error(`addWordHandler failed: ${error.message}`);
+    setLoading(true);
+    const result = await addWord(word);
+    if (result.ok) {
+      toast.success("Word added successfully!");
+    } else {
+      toast.error(result.statusText);
     }
+    setLoading(false);
   };
 
-  return { word, addWord: addWordHandler };
+  return { loading, addWord: addWordHandler };
 };
 
 export default useAddWord;

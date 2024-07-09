@@ -1,23 +1,25 @@
 import { useState } from 'react';
 import { addSynonym } from '../api/synonym';
+import { toast } from 'react-toastify';
 
 const useAddSynonym = () => {
-  const [synonym, setSynonym] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const addSynonymHandler = async ({word, synonym:wordSynonym}) => {
+  const addSynonymHandler = async ({ word, synonym: wordSynonym }) => {
+    setLoading(true);
     try {
       const result = await addSynonym(word, wordSynonym);
-      if (result.success) {
-        setSynonym(result.data);
-      } else {
-        console.error({ error: result.error });
+      if (result.ok) {
+        toast.success('Synonym added successfully!');
+      }else {
+        toast.error(result.statusText);
       }
-    } catch (error) {
-      console.error(`addSynonymHandler failed: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
-  return { synonym, addSynonym: addSynonymHandler };
+  return { loading, addSynonym: addSynonymHandler };
 };
 
 export default useAddSynonym;
