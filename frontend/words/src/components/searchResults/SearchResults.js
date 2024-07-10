@@ -9,7 +9,7 @@ const SearchResults = ({ results }) => {
       <div className="card-header">Synonyms:</div>
       <div className="d-flex max-w-28rem flex-wrap">
         {results.synonyms?.map((item) => (
-          <span key={item.id} className="badge bg-secondary fs-6 m-2">{item.title}</span>
+          <span key={item.id} className="badge bg-primary fs-6 m-2">{item.title}</span>
         ))}
       </div>
     </div>
