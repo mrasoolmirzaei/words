@@ -57,6 +57,7 @@ func (s *Server) Serve(listen string) error {
 	}
 
 	go func() {
+		// Wait for stop signal.
 		<-s.stopChan
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
@@ -67,6 +68,7 @@ func (s *Server) Serve(listen string) error {
 		}
 	}()
 
+	// Start the server.
 	if err := hs.ListenAndServe(); err != http.ErrServerClosed {
 		return err
 	}

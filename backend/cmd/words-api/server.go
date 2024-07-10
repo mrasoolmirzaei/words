@@ -19,6 +19,7 @@ func serverAction(log *logrus.Logger) cli.ActionFunc {
 	return func(cc *cli.Context) error {
 		db, err := db.NewDB(cc.String("pq-conn"))
 		if err != nil {
+			log.Errorf("failed to connect to db: %v", err)
 			return err
 		}
 		serverLogger := log.WithField("context", "server")
@@ -34,6 +35,7 @@ func serverAction(log *logrus.Logger) cli.ActionFunc {
 		log.Debug("Initializing server.")
 		s, err := server.NewServer(config)
 		if err != nil {
+			log.Errorf("failed to initialize server: %v", err)
 			return err
 		}
 

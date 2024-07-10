@@ -14,6 +14,7 @@ func main() {
 
 	log := logrus.New()
 	log.Out = os.Stdout
+	log.Level = logrus.DebugLevel
 
 	err := godotenv.Load("../../.env")
 	if err != nil {

@@ -13,9 +13,6 @@ var addWordSQL string
 //go:embed sqls/addSynonym.sql
 var addSynonymSQL string
 
-//go:embed sqls/getWord.sql
-var getWordSQL string
-
 //go:embed sqls/searchWord.sql
 var searchWordSQL string
 
@@ -28,8 +25,6 @@ var getChildSynonymsSQL string
 type Storer interface {
 	Close() error
 
-	// GetWord returns a word by its ID.
-	GetWord(id string) (*Word, error)
 	// GetDirectSynonyms returns a list of direct synonyms for a word.
 	GetSynonyms(id int) ([]*Word, error)
 
@@ -60,18 +55,7 @@ func (db *DB) Close() error {
 	return db.conn.Close()
 }
 
-func (db *DB) GetWord(id string) (*Word, error) {
-	row := db.conn.QueryRow(getWordSQL, id)
-
-	var w Word
-	err := row.Scan(&w.ID, &w.Title)
-	if err != nil {
-		return nil, err
-	}
-
-	return &w, nil
-}
-
+// AddWord adds a new word to the database.
 func (db *DB) AddWord(title string) (*Word, error) {
 	row := db.conn.QueryRow(addWordSQL, title)
 
@@ -84,6 +68,7 @@ func (db *DB) AddWord(title string) (*Word, error) {
 	return word, nil
 }
 
+// AddSynonym adds a new synonym relationship to the database.
 func (db *DB) AddSynonym(word_id_1, word_id_2 int) error {
 	_, err := db.conn.Exec(addSynonymSQL, word_id_1, word_id_2)
 	if err != nil {
@@ -93,6 +78,7 @@ func (db *DB) AddSynonym(word_id_1, word_id_2 int) error {
 	return nil
 }
 
+// SearchWord searches for a word by its title.
 func (db *DB) SearchWord(title string) (*Word, error) {
 	row := db.conn.QueryRow(searchWordSQL, title)
 
@@ -105,22 +91,27 @@ func (db *DB) SearchWord(title string) (*Word, error) {
 	return &w, nil
 }
 
+// GetSynonyms find synonyms for a word using a recursive query.
 func (db *DB) GetSynonyms(id int) ([]*Word, error) {
+	// find parent synonym nodes
 	parentWords, err := db.listWordsByID(id, getParentSynonymsSQL)
 	if err != nil {
 		return nil, err
 	}
 
+	// find child nodes
 	childWords, err := db.listWordsByID(id, getChildSynonymsSQL)
 	if err != nil {
 		return nil, err
 	}
 
+	// combine parent and child nodes
 	words := append(parentWords, childWords...)
 
 	return words, nil
 }
 
+// listWordsByID returns a list of words based on the given ID and SQL query.
 func (db *DB) listWordsByID(id int, sqlQuery string) ([]*Word, error) {
 	childrenRows, err := db.conn.Query(sqlQuery, id)
 	if err != nil {

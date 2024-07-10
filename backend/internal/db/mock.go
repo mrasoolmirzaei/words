@@ -6,10 +6,6 @@ func (db *DBMock) Close() error {
 	return nil
 }
 
-func (db *DBMock) GetWord(id string) (*Word, error) {
-	return &Word{ID: 1, Title: "test"}, nil
-}
-
 func (db *DBMock) AddWord(title string) (*Word, error) {
 	return &Word{ID: 1, Title: title}, nil
 }

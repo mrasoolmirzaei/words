@@ -55,7 +55,7 @@ func (w InputWord) Validate() (string, bool) {
 		return errorMsg, isInvalid
 	}
 	// Check if word is too long or too short
-	if len(w) > maximumWordLength || len(w) < minimumWordLength  {
+	if len(w) > maximumWordLength || len(w) < minimumWordLength {
 		errorMsg = fmt.Sprintf("input word is too long or too short, maximum 45 and minimum 2 characters. current length: %v", len(w))
 		isInvalid = true
 		return errorMsg, isInvalid

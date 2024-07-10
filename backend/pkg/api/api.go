@@ -30,6 +30,7 @@ func NewAPI(db db.Storer, log logrus.FieldLogger) *API {
 func (a *API) AddWord(req AddWordRequest) (*AddWordResponse, *Error) {
 	errMsg, isInvalid := req.Validate()
 	if isInvalid {
+		a.log.Debugf("invalid add word request: %v", errMsg)
 		return nil, &Error{
 			Message:  errMsg,
 			HttpCode: http.StatusBadRequest,
@@ -52,6 +53,7 @@ func (a *API) AddWord(req AddWordRequest) (*AddWordResponse, *Error) {
 func (a *API) AddSynonym(req AddSynonymRequest) *Error {
 	errMsg, isInvalid := req.Validate()
 	if isInvalid {
+		a.log.Debugf("invalid add synonym request: %v", errMsg)
 		return &Error{
 			Message:  errMsg,
 			HttpCode: http.StatusBadRequest,
@@ -95,6 +97,7 @@ func (a *API) AddSynonym(req AddSynonymRequest) *Error {
 func (a *API) GetSynonyms(req GetSynonymsRequest) (*GetSynonymsResponse, *Error) {
 	errMsg, isInvalid := req.Validate()
 	if isInvalid {
+		a.log.Debugf("invalid get synonyms request: %v", errMsg)
 		return nil, &Error{
 			Message:  errMsg,
 			HttpCode: http.StatusBadRequest,
