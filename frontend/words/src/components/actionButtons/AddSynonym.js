@@ -1,16 +1,31 @@
 import { useState } from "react";
 import useAddSynonym from "../../services/hook/useAddSynonym";
+import { lettersOnlyPattern } from "../../constants/regex";
 
 const AddSynonym = () => {
   const { addSynonym } = useAddSynonym();
   const [word, setWord] = useState("");
   const [synonym, setSynonym] = useState("");
+  const [wordValidationError, setWordValidationError] = useState("");
+  const [synonymValidationError, setSynonymValidationError] = useState("");
 
-  const handleSynonym = (e) => {
-    setSynonym(e.target.value);
+  const handleChangeSynonym = (e) => {
+    const { value } = e.target;
+    setSynonym(value);
+    if (lettersOnlyPattern.test(value)) {
+      setSynonymValidationError("");
+    } else {
+      setSynonymValidationError("Please enter only letters.");
+    }
   };
-  const handleWord = (e) => {
-    setWord(e.target.value);
+  const handleChangeWord = (e) => {
+    const { value } = e.target;
+    setWord(value);
+    if (lettersOnlyPattern.test(value)) {
+      setWordValidationError("");
+    } else {
+      setWordValidationError("Please enter only letters.");
+    }
   };
   const handleAddSynonym = () => {
     addSynonym({ word, synonym });
@@ -19,28 +34,41 @@ const AddSynonym = () => {
   };
 
   return (
-    <div className="form-group my-3 w-100">
-      <label htmlFor="wordInput">
-        <strong>Add Synonym</strong>
-      </label>
+    <div className="form-group min-h-7rem w-100">
+      <strong>Add Synonym</strong>
       <div className="input-group">
-        <button className="input-group-text" onClick={handleAddSynonym}>
+        <button
+          className="btn btn-primary h-min-content"
+          disabled={wordValidationError || synonymValidationError}
+          onClick={handleAddSynonym}
+        >
           +
         </button>
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Word"
-          value={word}
-          onChange={handleWord}
-        />
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Synonym"
-          value={synonym}
-          onChange={handleSynonym}
-        />
+        <div>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Word"
+            value={word}
+            onChange={handleChangeWord}
+          />
+          {wordValidationError && (
+            <p className="text-danger">{wordValidationError}</p>
+          )}
+        </div>
+
+        <div>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Synonym"
+            value={synonym}
+            onChange={handleChangeSynonym}
+          />
+          {synonymValidationError && (
+            <p className="text-danger">{synonymValidationError}</p>
+          )}
+        </div>
       </div>
     </div>
   );
