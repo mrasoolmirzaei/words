@@ -24,7 +24,7 @@ func (suite *testSuite) SetupSuite() {
 	logger.SetLevel(logrus.DebugLevel)
 	logger.SetOutput(os.Stderr)
 
-	dbMock := &db.DBMock{}
+	dbMock := &db.PQMock{}
 	api := api.NewAPI(dbMock, logger)
 	config := &server.Config{
 		Logger: logger,

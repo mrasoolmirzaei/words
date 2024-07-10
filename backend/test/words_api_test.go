@@ -14,12 +14,12 @@ import (
 
 const (
 	addWordApiURL     = "http://localhost:8090/word"
-	addSynonymApiURL  = "http://localhost:8090/synonym/test"
+	addSynonymApiURL  = "http://localhost:8090/synonym/"
 	getSynonymsApiURL = "http://localhost:8090/synonyms/test"
 	contentType       = "application/json"
 )
 
-func (suite *testSuite) TestAddWord() {
+func (suite *testSuite) TestAddWordHappyCases() {
 	type request struct {
 		Title string `json:"title"`
 	}
@@ -56,30 +56,75 @@ func (suite *testSuite) TestAddWord() {
 	}
 }
 
-func (suite *testSuite) TestAddSynonym() {
+func (suite *testSuite) TestAddWordFailedCases() {
 	type request struct {
-		WordTitle    string `json:"word"`
-		SynonymTitle string `json:"synonym"`
+		Title string `json:"title"`
 	}
 
 	cases := []struct {
 		testName string
 		request  request
+		expected int
 	}{
 		{
-			testName: "add synonym",
-			request:  request{WordTitle: "test", SynonymTitle: "testsynonym"},
+			testName: "add word",
+			request:  request{Title: "erroruniqueviolation"},
+			expected: http.StatusConflict,
 		},
 	}
 
 	for _, tc := range cases {
 		body, err := json.Marshal(tc.request)
 		require.NoError(suite.T(), err)
-		res, err := http.Post(addSynonymApiURL, contentType, bytes.NewBuffer(body))
+		res, err := http.Post(addWordApiURL, contentType, bytes.NewBuffer(body))
 		require.NoError(suite.T(), err)
 		defer res.Body.Close()
 
-		assert.Equal(suite.T(), http.StatusCreated, res.StatusCode)
+		assert.Equal(suite.T(), tc.expected, res.StatusCode)
+	}
+}
+
+func (suite *testSuite) TestAddSynonym() {
+	type request struct {
+		WordTitle    string
+		SynonymTitle string `json:"synonym"`
+	}
+
+	cases := []struct {
+		testName string
+		request  request
+		expected int
+	}{
+		{
+			testName: "add already created synonym",
+			request:  request{WordTitle: "testone", SynonymTitle: "testtwo"},
+			expected: http.StatusConflict,
+		},
+		{
+			testName: "violate ID constraint",
+			request:  request{WordTitle: "testtwo", SynonymTitle: "testone"},
+			expected: http.StatusConflict,
+		},
+		{
+			testName: "add synonym",
+			request:  request{WordTitle: "testone", SynonymTitle: "testthree"},
+			expected: http.StatusCreated,
+		},
+		{
+			testName: "add not found synonym",
+			request:  request{WordTitle: "testone", SynonymTitle: "errornotfound"},
+			expected: http.StatusNotFound,
+		},
+	}
+
+	for _, tc := range cases {
+		body, err := json.Marshal(tc.request)
+		require.NoError(suite.T(), err)
+		res, err := http.Post(addSynonymApiURL+tc.request.WordTitle, contentType, bytes.NewBuffer(body))
+		require.NoError(suite.T(), err)
+		defer res.Body.Close()
+
+		assert.Equal(suite.T(), tc.expected, res.StatusCode)
 	}
 }
 

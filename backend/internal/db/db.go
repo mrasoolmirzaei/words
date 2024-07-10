@@ -5,6 +5,8 @@ import (
 	"log"
 
 	_ "embed"
+
+	_ "github.com/lib/pq"
 )
 
 //go:embed sqls/addWord.sql
