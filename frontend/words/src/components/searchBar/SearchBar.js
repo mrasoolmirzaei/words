@@ -14,7 +14,7 @@ const SearchBar = ({ onSearch }) => {
     onSearch(searchQuery);
   };
   return (
-    <div className="input-group mb-3">
+    <div className="input-group mt-5">
       <input
         type="search"
         className="form-control"

@@ -10,18 +10,17 @@ const App = () => {
   const { loading, searchResults, handleSearch } = useSearchWord();
 
   return (
-    <>
+    <div className="m-5">
+      <h1 className="text-center p-5">Welcome to Words</h1>
       <div className="position-absolute top-50 start-50 translate-middle">
-        <div className="d-flex justify-content-between mb-3 gap-2">
-          <AddSynonym />
-          <AddWord />
-        </div>
+        <AddWord />
+        <AddSynonym />
         <SearchBar onSearch={handleSearch} />
         <SearchResults results={searchResults} />
       </div>
-        {loading && <Loading />}
+      {loading && <Loading />}
       <ToastContainer position="bottom-left" />
-    </>
+    </div>
   );
 };
 

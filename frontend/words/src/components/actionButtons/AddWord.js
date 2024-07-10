@@ -11,11 +11,13 @@ const AddWord = () => {
   };
 
   return (
-    <div className="form-group">
-      <label htmlFor="wordInput">Add Word</label>
+    <div className="form-group my-3">
+      <label htmlFor="wordInput">
+        <strong>Add Word</strong>
+      </label>
       <div className="input-group">
         <button className="input-group-text" onClick={handleAddWord}>
-            +
+          +
         </button>
         <input
           type="text"
