@@ -16,11 +16,8 @@ var addSynonymSQL string
 //go:embed sqls/searchWord.sql
 var searchWordSQL string
 
-//go:embed sqls/getParentSynonyms.sql
-var getParentSynonymsSQL string
-
-//go:embed sqls/getChildSynonyms.sql
-var getChildSynonymsSQL string
+//go:embed sqls/getSynonyms.sql
+var getSynonymsSQL string
 
 type Storer interface {
 	Close() error
@@ -91,38 +88,18 @@ func (db *DB) SearchWord(title string) (*Word, error) {
 	return &w, nil
 }
 
-// GetSynonyms find synonyms for a word using a recursive query.
+// GetSynonyms find synonyms for a word by its ID.
 func (db *DB) GetSynonyms(id int) ([]*Word, error) {
-	// find parent synonym nodes
-	parentWords, err := db.listWordsByID(id, getParentSynonymsSQL)
+	rows, err := db.conn.Query(getSynonymsSQL, id)
 	if err != nil {
 		return nil, err
 	}
-
-	// find child nodes
-	childWords, err := db.listWordsByID(id, getChildSynonymsSQL)
-	if err != nil {
-		return nil, err
-	}
-
-	// combine parent and child nodes
-	words := append(parentWords, childWords...)
-
-	return words, nil
-}
-
-// listWordsByID returns a list of words based on the given ID and SQL query.
-func (db *DB) listWordsByID(id int, sqlQuery string) ([]*Word, error) {
-	childrenRows, err := db.conn.Query(sqlQuery, id)
-	if err != nil {
-		return nil, err
-	}
-	defer childrenRows.Close()
+	defer rows.Close()
 
 	var words []*Word
-	for childrenRows.Next() {
+	for rows.Next() {
 		var w Word
-		err := childrenRows.Scan(&w.ID, &w.Title)
+		err := rows.Scan(&w.ID, &w.Title)
 		if err != nil {
 			return nil, err
 		}

@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 
 	"github.com/lib/pq"
@@ -13,6 +14,9 @@ const (
 	UniquenessViolation = "23505"
 	NotFound            = "20000"
 	CheckViolation      = "23514"
+
+	WordPrefix = "Word"
+	SynonymPrefix = "Synonym"
 )
 
 type API struct {
@@ -40,7 +44,7 @@ func (a *API) AddWord(req AddWordRequest) (*AddWordResponse, *Error) {
 	dbWord, err := a.db.AddWord(req.Title.String())
 	if err != nil {
 		a.log.Errorf("failed to add word: %v", err)
-		return nil, customizeError(err)
+		return nil, customizeError(err, WordPrefix)
 	}
 
 	return &AddWordResponse{
@@ -62,13 +66,13 @@ func (a *API) AddSynonym(req AddSynonymRequest) *Error {
 	word, err := a.db.SearchWord(req.WordTitle.String())
 	if err != nil {
 		a.log.Errorf("failed to find first word %v: %v", req.WordTitle, err)
-		return customizeError(err)
+		return customizeError(err, WordPrefix)
 	}
 
 	synonym, err := a.db.SearchWord(req.SynonymTitle.String())
 	if err != nil {
 		a.log.Errorf("failed to find second word: %v", err)
-		return customizeError(err)
+		return customizeError(err, WordPrefix)
 	}
 
 	err = a.db.AddSynonym(word.ID, synonym.ID)
@@ -76,7 +80,7 @@ func (a *API) AddSynonym(req AddSynonymRequest) *Error {
 		return nil
 	}
 
-	cErr := customizeError(err)
+	cErr := customizeError(err, SynonymPrefix)
 	if cErr.DBErrorCode != CheckViolation {
 		a.log.Errorf("failed to add synonym: %v", err)
 		return cErr
@@ -88,7 +92,7 @@ func (a *API) AddSynonym(req AddSynonymRequest) *Error {
 	err = a.db.AddSynonym(synonym.ID, word.ID)
 	if err != nil {
 		a.log.Errorf("failed to add synonym: %v", err)
-		return customizeError(err)
+		return customizeError(err, SynonymPrefix)
 	}
 
 	return nil
@@ -107,13 +111,13 @@ func (a *API) GetSynonyms(req GetSynonymsRequest) (*GetSynonymsResponse, *Error)
 	word, err := a.db.SearchWord(req.WordTitle.String())
 	if err != nil {
 		a.log.Errorf("failed to find word: %v", err)
-		return nil, customizeError(err)
+		return nil, customizeError(err, WordPrefix)
 	}
 
 	synonyms, err := a.db.GetSynonyms(word.ID)
 	if err != nil {
 		a.log.Errorf("failed to get synonyms: %v", err)
-		return nil, customizeError(err)
+		return nil, customizeError(err, SynonymPrefix)
 	}
 
 	resp := &GetSynonymsResponse{}
@@ -128,14 +132,14 @@ func (a *API) GetSynonyms(req GetSynonymsRequest) (*GetSynonymsResponse, *Error)
 	return resp, nil
 }
 
-func customizeError(err error) *Error {
+func customizeError(err error, prefix string) *Error {
 	customizedError := &Error{
 		Message:  "internal server error",
 		HttpCode: 500,
 	}
 
 	if err == sql.ErrNoRows {
-		customizedError.Message = "word not found"
+		customizedError.Message = fmt.Sprintf("%v not found", prefix)
 		customizedError.HttpCode = http.StatusNotFound
 		return customizedError
 	}
@@ -148,10 +152,10 @@ func customizeError(err error) *Error {
 
 	switch pgErr.Code {
 	case NotFound:
-		customizedError.Message = "word not found"
+		customizedError.Message = fmt.Sprintf("%v not found", prefix)
 		customizedError.HttpCode = http.StatusNotFound
 	case UniquenessViolation:
-		customizedError.Message = "word already exists"
+		customizedError.Message = fmt.Sprintf("%v already exists", prefix)
 		customizedError.HttpCode = http.StatusConflict
 	}
 
