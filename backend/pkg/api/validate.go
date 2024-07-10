@@ -5,39 +5,22 @@ import (
 	"strings"
 )
 
+const (
+	// Longest word in English dictionary is 45 characters
+	maximumWordLength = 45
+	minimumWordLength = 2
+)
+
 func (r GetSynonymsRequest) Validate() (string, bool) {
-	var errorMsg string
-	isInvalid := false
-
-	if r.WordTitle == "" {
-		errorMsg = "input word is empty"
-		isInvalid = true
-		return errorMsg, isInvalid
-	}
-
-	errorMsg, isInvalid = r.WordTitle.Validate()
-
-	return errorMsg, isInvalid
+	return r.WordTitle.Validate()
 }
 
 func (r AddSynonymRequest) Validate() (string, bool) {
 	var errorMsg string
 	isInvalid := false
 
-	if r.WordTitle == "" {
-		errorMsg = "input word is empty"
-		isInvalid = true
-		return errorMsg, isInvalid
-	}
-
 	errorMsg, isInvalid = r.WordTitle.Validate()
 	if isInvalid {
-		return errorMsg, isInvalid
-	}
-
-	if r.SynonymTitle == "" {
-		errorMsg = "input synonym is empty"
-		isInvalid = true
 		return errorMsg, isInvalid
 	}
 
@@ -56,37 +39,33 @@ func (r AddSynonymRequest) Validate() (string, bool) {
 }
 
 func (r AddWordRequest) Validate() (string, bool) {
-	var errorMsg string
-	isInvalid := false
-
-	if r.Title == "" {
-		errorMsg = "input word is empty"
-		isInvalid = true
-		return errorMsg, isInvalid
-	}
-
-	errorMsg, isInvalid = r.Title.Validate()
-
-	return errorMsg, isInvalid
+	return r.Title.Validate()
 }
 
 func (w InputWord) Validate() (string, bool) {
 	var errorMsg string
 	isInvalid := false
 
+	// Pre-process the word string, remove leading and trailing spaces and convert to lowercase
 	w.PreProcess()
-
-	// Longest word in English dictionary is 45 characters
-	if len(w) > 45 || len(w) < 2  {
+	// Check if word is empty
+	if len(w) == 0 {
+		errorMsg = "input word is empty"
+		isInvalid = true
+		return errorMsg, isInvalid
+	}
+	// Check if word is too long or too short
+	if len(w) > maximumWordLength || len(w) < minimumWordLength  {
 		errorMsg = fmt.Sprintf("input word is too long or too short, maximum 45 and minimum 2 characters. current length: %v", len(w))
 		isInvalid = true
+		return errorMsg, isInvalid
 	}
 	// Check if all characters are alphabets
 	for _, c := range w {
 		if c < 'a' || c > 'z' {
-			errorMsg = fmt.Sprintf("input word should contain only alphabets. invalid character: %v", c)
+			errorMsg = fmt.Sprintf("input word should contain only alphabets. invalid character: %v", string(c))
 			isInvalid = true
-			break
+			return errorMsg, isInvalid
 		}
 	}
 

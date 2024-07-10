@@ -29,7 +29,7 @@ func TestAddSynonymRequestValidate(t *testing.T) {
 		errMsg  string
 	}{
 		{AddSynonymRequest{WordTitle: "", SynonymTitle: ""}, true, "input word is empty"},
-		{AddSynonymRequest{WordTitle: "validword", SynonymTitle: ""}, true, "input synonym is empty"},
+		{AddSynonymRequest{WordTitle: "validword", SynonymTitle: ""}, true, "input word is empty"},
 		{AddSynonymRequest{WordTitle: "validword", SynonymTitle: "validsynonym"}, false, ""},
 		{AddSynonymRequest{WordTitle: "sameword", SynonymTitle: "sameword"}, true, "input word and synonym are the same"},
 	}
@@ -69,7 +69,7 @@ func TestInputWordValidate(t *testing.T) {
 		{"a", true, "input word is too long or too short, maximum 45 and minimum 2 characters. current length: 1"},
 		{"toolongwordthatwillcausevalidationtofailbecauseitisveryverylong", true, "input word is too long or too short, maximum 45 and minimum 2 characters. current length: 63"},
 		{"validword", false, ""},
-		{"invalid1word", true, "input word should contain only alphabets. invalid character: 49"},
+		{"invalid1word", true, "input word should contain only alphabets. invalid character: 1"},
 	}
 
 	for _, tt := range tests {
