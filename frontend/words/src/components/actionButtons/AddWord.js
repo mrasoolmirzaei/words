@@ -11,7 +11,7 @@ const AddWord = () => {
   };
 
   return (
-    <div className="form-group my-3">
+    <div className="form-group my-3 w-100">
       <label htmlFor="wordInput">
         <strong>Add Word</strong>
       </label>

@@ -19,7 +19,7 @@ const AddSynonym = () => {
   };
 
   return (
-    <div className="form-group my-3">
+    <div className="form-group my-3 w-100">
       <label htmlFor="wordInput">
         <strong>Add Synonym</strong>
       </label>

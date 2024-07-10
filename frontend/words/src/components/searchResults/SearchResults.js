@@ -6,14 +6,12 @@ const SearchResults = ({ results }) => {
   }
   return (
     <div className="card">
-      <div className="card-header">Search Results:</div>
-      <ul className="list-group list-group-flush">
+      <div className="card-header">Synonyms:</div>
+      <div className="d-flex max-w-28rem flex-wrap">
         {results.synonyms?.map((item) => (
-          <li key={item.id} className="list-group-item">
-            {item.title}
-          </li>
+          <span key={item.id} className="badge bg-secondary fs-6 m-2">{item.title}</span>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
