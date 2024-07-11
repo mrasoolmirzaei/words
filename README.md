@@ -24,6 +24,8 @@ make migration
 4- Run backend and frontend on two separate terminal:
 ```
 make run-backend
+```
+```
 make run-front
 ```
 
