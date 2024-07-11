@@ -1,0 +1,1 @@
+PQ_CONN=postgresql://postgres:123@localhost:3399/postgres?sslmode=disable
