@@ -75,21 +75,10 @@ func (a *API) AddSynonym(req AddSynonymRequest) *Error {
 		return customizeError(err, WordPrefix)
 	}
 
+	if word.ID > synonym.ID {
+		word, synonym = synonym, word
+	}
 	err = a.db.AddSynonym(word.ID, synonym.ID)
-	if err == nil {
-		return nil
-	}
-
-	cErr := customizeError(err, SynonymPrefix)
-	if cErr.DBErrorCode != CheckViolation {
-		a.log.Errorf("failed to add synonym: %v", err)
-		return cErr
-	}
-
-	// here the error is a check violation, which means the synonym id is smaller than the word id
-	// so we try to add the synonym in the opposite order
-	// if it fails again, we return the error
-	err = a.db.AddSynonym(synonym.ID, word.ID)
 	if err != nil {
 		a.log.Errorf("failed to add synonym: %v", err)
 		return customizeError(err, SynonymPrefix)
