@@ -1,5 +1,6 @@
 # Words
 Create collections of words and their synonyms.
+The project is publicly deployed [here](http://188.245.69.243:3000/).
 
 ## How To Run Locally
 ### Prerequisite
@@ -18,7 +19,7 @@ docker run --name lendo-postgres -p 127.0.0.1:3399:5432 -e POSTGRES_PASSWORD=123
 ```
 make migration
 ```
-3- Create the .env file exactly like the sample_env.txt file.
+3- Create the .env file in backend directory exactly like the sample_env.txt file.
 
 4- Run backend and frontend on two separate terminal:
 ```
